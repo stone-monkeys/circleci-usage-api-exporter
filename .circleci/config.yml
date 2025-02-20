@@ -19,7 +19,7 @@ jobs:
       - run:
           environment:
             START_DATE: "2024-12-01"
-            END_DATE: "2024-12-15"
+            END_DATE: "2025-02-15"
             ORG_ID: << pipeline.parameters.org_id >>
           name: Get Usage Report
           command: |
