@@ -24,6 +24,8 @@ response = requests.post(
     headers={"Circle-Token": CIRCLECI_TOKEN, "Content-Type": "application/json"},
     data=json.dumps(post_data)
 )
+#print out the API response for the usage report request
+print("Response Content:", response.json())  # This will parse the JSON response
 
 # Once requested, the report can take some time to process, so a retry is built-in
 if response.status_code == 201:
