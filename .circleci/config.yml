@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   org_id:
     type: string
-    default: $CIRCLE_ORGANIZATION_ID
+    default: ${CIRCLE_ORGANIZATION_ID}
 
 jobs:
   generate-usage-report:

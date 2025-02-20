@@ -12,6 +12,8 @@ CIRCLECI_TOKEN = os.getenv('CIRCLECI_API_TOKEN')
 START_DATE = os.getenv('START_DATE')
 END_DATE = os.getenv('END_DATE')
 
+print(f"Org ID is {ORG_ID}")
+
 post_data = {
     "start": f"{START_DATE}T00:00:01Z",
     "end": f"{END_DATE}T00:00:01Z",
