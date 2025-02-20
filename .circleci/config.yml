@@ -15,7 +15,7 @@ jobs:
           environment:
             START_DATE: "2024-12-01"
             END_DATE: "2024-12-15"
-            ORG_ID: $CIRCLE_ORGANIZATION_ID
+            ORG_ID: "$CIRCLE_ORGANIZATION_ID"
           name: Get Usage Report
           command: |
             python ./src/get_usage_report.py
