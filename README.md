@@ -1,55 +1,82 @@
-# CircleCI Usage API Exporter
+<h1 align="center">
+  <br>
+  <a href="https://www.circleci.com/"><img src="./circleci-logo.png" alt="CircleCI" width="200"></a>
+  <br>
+  Usage API Exporter
+  <br>
+</h1>
 
----
-**Disclaimer:**
+<h4 align="center">Open-source tools and examples for working with CircleCI's <a href="https://circleci.com/docs/api/v2/index.html#tag/Usage" target="_blank">Usage API</a> to optimize costs and improve pipeline performance.</h4>
 
-CircleCI Labs, including this repo, is a collection of solutions developed by members of CircleCI's field engineering teams through our engagement with various customer needs.
+<p align="center">
+  <a href="#introduction">Introduction</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#whats-included">What's Included</a> •
+  <a href="#minimum-requirements">Minimum Requirements</a> •
+    <a href="#documentation">Documentation</a> •
+  <a href="#contributing">Contributing</a>
+</p>
 
--   ✅ Created by engineers @ CircleCI
--   ✅ Used by real CircleCI customers
--   ❌ **not** officially supported by CircleCI support
 
----
+> This repository is part of CircleCI Labs - solutions developed by CircleCI's field engineering team based on real customer needs.
+> 
+> ✅ **Created by Field Engineers @ CircleCI**  
+> ✅ **Used by real CircleCI customers**  
+> ❌ **NOT officially supported by CircleCI support**
 
 ## Introduction
 
-This tool outlines using the CircleCI Usage API to create and download usage reports. The data is then merged and transformed into a graph to show credit usage per project.
+CircleCI's Usage API provides powerful data about your CI/CD pipelines. This toolkit helps you quickly turn that data into actionable insights with ready-to-use scripts, analysis templates, and visualization integrations.
 
-For more info on the API itself, visit the docs [here](https://circleci.com/docs/api/v2/index.html#tag/Usage).
+### What you can discover:
 
-All the outputs are saved as an [artifact](https://circleci.com/docs/artifacts/) on CircleCI.
+* Which jobs are burning through your budget 💰
+* Where your pipelines are slowest 🐌
+* Which resources are underutilized 📉
+* How to right-size your compute classes ⚡
 
-### Just added - Datadog Metrics
+## Quick Start
 
-The project has been updated to include a script that will parse the merged csv files, and send these as custom metrics to Datadog for analysis.
+```bash
+git clone git@github.com:CircleCI-Labs/circleci-usage-api-exporter.git
+cd circleci-usage-api-exporter
 
-### Use Cases
+# These env vars are read by get_usage_report.py
+export ORG_ID=""
+export CIRCLECI_API_TOKEN=""
+export START_DATE="2025-07-01"
+export END_DATE="2025-06-01"
 
-While the implementation shown in this project is simple, there are many use cases for implementing the Usage API in this way. 
+# Export your usage data
+python scripts/get_usage_report.py
+```
 
-Some of the advantages include:
+This will download a raw CSV dataset locally ready for analysis.
 
-- [Scheduling the pipeline](https://circleci.com/docs/scheduled-pipelines/) to run weekly, to enable users to target projects that have a higher credit usage
-- Enabling the comparison of weekly results
-- Can be combined with the [Slack orb](https://circleci.com/developer/orbs/orb/circleci/slack) to send notifications on specific usage metrics
-- Can be amended to target job-level data instead, to track the cost of failing jobs
-- Can group projects by team, to enable cross-company billing
+## What's Included
 
-## Tools
+* **Utility to download usage data** - Quickly export data from the Usage API
+* **Data processing scripts** - Clean and transform raw exports for analysis  
+* **Visualization examples** - Templates for popular BI tools and custom dashboards
 
-To learn more about working with `*.csv` files, and transforming the data once it's downloaded, check out [pandas](https://pandas.pydata.org/).
+## Minimum Requirements
 
-To learn more about graphs using python, check out [Matplotlib](https://matplotlib.org/stable/).
+* Python 3.8+
+* A CircleCI personal API token ([get yours here](https://app.circleci.com/settings/user/tokens))
+* An organisation ID (find this in "Organization Settings")
 
-## Requirements
+## Documentation
 
-- A CircleCI [personal API token](https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token) is required in order to use the API. This is saved with the name `CIRCLECI_API_TOKEN`, in a context.
-- A date range is required. These are specified using the `START_DATE` and `END_DATE` environment variables
-- An organisation ID is required. This defaults to the ID of the organisation that is executing the job on CircleCI.
-- If sending metrics to Datadog, then a `DATADOG_API_KEY` is required.
+* [**API Reference**](https://circleci.com/docs/api/v2/index.html#tag/Usage) - Usage API endpoints and data schema
+* **[Examples](examples/)** - BI tool templates, analysis notebooks, and integration guides
 
-### Caveats
+## Contributing
 
-- My python skillz aren't great.
-- If using Datadog, there will be extra charges for storing these custom metrics. See
-    - Alternatives include using the [CircleCI Datadog integration](https://docs.datadoghq.com/integrations/circleci/), as well as [outbound  webhooks](https://circleci.com/docs/webhooks/#outbound-webhooks) from CircleCI.
+### Ways to Contribute
+
+* Request additions
+* Add new visualization templates
+* Improve analysis algorithms
+* Share real-world optimization stories
+* Fix bugs or improve documentation
+* Add support for other BI tools
