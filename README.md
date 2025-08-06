@@ -46,7 +46,7 @@ To learn more about graphs using python, check out [Matplotlib](https://matplotl
 - A CircleCI [personal API token](https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token) is required in order to use the API. This is saved with the name `CIRCLECI_API_TOKEN`, in a context.
 - A date range is required. These are specified using the `START_DATE` and `END_DATE` environment variables
 - An organisation ID is required. This defaults to the ID of the organisation that is executing the job on CircleCI.
-- If sending metrics to Datadog, then a `DATADOG_API_KEY` is required.
+- If sending metrics to Datadog, then a `DD_API_KEY` is required.
 
 ### Caveats
 
