@@ -2,7 +2,7 @@
   <br>
   <a href="https://www.circleci.com/"><img src="./circleci-logo.png" alt="CircleCI" width="200"></a>
   <br>
-  Usage API Exporter
+  Usage API Reporter
   <br>
 </h1>
 
@@ -38,8 +38,8 @@ CircleCI's Usage API provides powerful data about your CI/CD pipelines. This too
 ## Quick Start
 
 ```bash
-git clone git@github.com:CircleCI-Labs/circleci-usage-api-exporter.git
-cd circleci-usage-api-exporter
+git clone git@github.com:CircleCI-Labs/circleci-usage-reporter.git
+cd circleci-usage-reporter
 
 # These env vars are read by get_usage_report.py
 export ORG_ID=""
