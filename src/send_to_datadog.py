@@ -22,7 +22,7 @@ from datadog_api_client.v1.model.event_create_request import EventCreateRequest
 class DatadogCSVIngest:
     """Process CSV data and send to Datadog."""
     
-    def __init__(self, api_key=None, application_key=None, site="datadoghq.eu"):
+    def __init__(self, api_key=None, application_key=None, site="datadoghq.com"):
         """Set up Datadog client with API credentials."""
         self.api_key = api_key or os.environ.get("DATADOG_API_KEY")
         self.application_key = application_key or os.environ.get("DATADOG_APP_KEY")
@@ -263,9 +263,9 @@ def main():
     parser.add_argument('--events', action='store_true', help='Send events to Datadog')
     parser.add_argument('--dry-run', action='store_true', help='Process without sending')
     parser.add_argument('--batch-size', type=int, default=100, help='Batch size (default: 100)')
-    parser.add_argument('--site', default='datadoghq.eu', 
+    parser.add_argument('--site', default='datadoghq.com',
                        choices=['datadoghq.com', 'datadoghq.eu', 'us3.datadoghq.com', 'us5.datadoghq.com'],
-                       help='Datadog site (default: datadoghq.eu)')
+                       help='Datadog site (default: datadoghq.com)')
     
     args = parser.parse_args()
     
