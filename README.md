@@ -70,8 +70,6 @@ This will download a raw CSV dataset locally ready for analysis.
 * [**API Reference**](https://circleci.com/docs/api/v2/index.html#tag/Usage) - Usage API endpoints and data schema
 * **[Examples](examples/)** - BI tool templates, analysis notebooks, and integration guides
 
-## Contributing
-
 ### Ways to Contribute
 
 * Request additions
