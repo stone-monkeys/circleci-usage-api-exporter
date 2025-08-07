@@ -24,11 +24,11 @@ class DatadogCSVIngest:
     
     def __init__(self, api_key=None, application_key=None, site="datadoghq.eu"):
         """Set up Datadog client with API credentials."""
-        self.api_key = api_key or os.environ.get("DATADOG_API_KEY")
-        self.application_key = application_key or os.environ.get("DATADOG_APP_KEY")
+        self.api_key = api_key or os.environ.get("DD_API_KEY")
+        self.application_key = application_key or os.environ.get("DD_APP_KEY")
         
         if not self.api_key:
-            raise ValueError("Datadog API key required. Use --api-key or set DATADOG_API_KEY env variable.")
+            raise ValueError("Datadog API key required. Use --api-key or set DD_API_KEY env variable.")
             
         # Configure Datadog client
         self.configuration = Configuration()
