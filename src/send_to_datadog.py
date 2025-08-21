@@ -4,32 +4,33 @@ Lightweight script to process a CSV file and send metrics to Datadog API.
 Usage: python send_to_datadog.py <path_to_csv> [--api-key <key>] [--batch-size <size>] [--site <site>]
 """
 
-import os, csv, argparse, time, math
+import argparse
+import csv
+import math
+import os
+import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List
 
 from datadog_api_client import ApiClient, Configuration
-from datadog_api_client.v2.api.metrics_api import MetricsApi
 from datadog_api_client.v1.api.events_api import EventsApi
+from datadog_api_client.v1.model.event_create_request import EventCreateRequest
+from datadog_api_client.v2.api.metrics_api import MetricsApi
 from datadog_api_client.v2.model.metric_intake_type import MetricIntakeType
 from datadog_api_client.v2.model.metric_payload import MetricPayload
 from datadog_api_client.v2.model.metric_point import MetricPoint
 from datadog_api_client.v2.model.metric_resource import MetricResource
 from datadog_api_client.v2.model.metric_series import MetricSeries
-from datadog_api_client.v1.model.event_create_request import EventCreateRequest
 
 
 class DatadogCSVIngest:
     """Process CSV data and send to Datadog."""
-    
     def __init__(self, api_key=None, application_key=None, site="datadoghq.com"):
         """Set up Datadog client with API credentials."""
         self.api_key = api_key or os.environ.get("DD_API_KEY")
-        self.application_key = application_key or os.environ.get("DD_APP_KEY")
-        
+        self.application_key = application_key or os.environ.get("DD_APP_KEY")      
         if not self.api_key:
-            raise ValueError("Datadog API key required. Use --api-key or set DD_API_KEY env variable.")
-            
+            raise ValueError("Datadog API key required. Use --api-key or set DD_API_KEY env variable.")          
         # Configure Datadog client
         self.configuration = Configuration()
         self.configuration.server_variables["site"] = site
@@ -40,8 +41,7 @@ class DatadogCSVIngest:
     def process_csv(self, csv_path: str) -> List[Dict[str, Any]]:
         """Parse CSV file and convert to typed dictionaries."""
         if not os.path.exists(csv_path):
-            raise FileNotFoundError(f"CSV file not found: {csv_path}")
-            
+            raise FileNotFoundError(f"CSV file not found: {csv_path}")      
         data = []
         with open(csv_path, 'r', encoding='utf-8') as file:
             for row in csv.DictReader(file):
@@ -51,13 +51,12 @@ class DatadogCSVIngest:
                     # Skip null-like values
                     if not value or value in ("\\N", r'\N', "\\\\N", "null"):
                         cleaned_row[key] = None
-                        continue
-                    
+                        continue                   
                     # UUID and string fields - keep as strings
                     if (key in ['ORGANIZATION_ID', 'PROJECT_ID', 'PIPELINE_ID', 'WORKFLOW_ID', 'JOB_ID', 'PIPELINE_TRIGGER_USER_ID'] or
                         key in ['ORGANIZATION_NAME', 'PROJECT_NAME', 'VCS_NAME', 'VCS_URL', 'VCS_BRANCH', 
-                              'PIPELINE_TRIGGER_SOURCE', 'WORKFLOW_NAME', 'JOB_NAME', 'JOB_BUILD_STATUS',
-                              'RESOURCE_CLASS', 'OPERATING_SYSTEM', 'EXECUTOR']):
+                                'PIPELINE_TRIGGER_SOURCE', 'WORKFLOW_NAME', 'JOB_NAME', 'JOB_BUILD_STATUS',
+                                'RESOURCE_CLASS', 'OPERATING_SYSTEM', 'EXECUTOR']):
                         cleaned_row[key] = value
                     
                     # Integer fields
@@ -199,9 +198,12 @@ class DatadogCSVIngest:
                 
                 # Set alert type
                 alert_type = "info"
-                if job_status == 'success': alert_type = "success"
-                elif job_status == 'failed': alert_type = "error"
-                elif job_status in ['canceled', 'cancelled']: alert_type = "warning"
+                if job_status == 'success': 
+                    alert_type = "success"
+                elif job_status == 'failed': 
+                    alert_type = "error"
+                elif job_status in ['canceled', 'cancelled']: 
+                    alert_type = "warning"
                 
                 # Calculate duration
                 duration = ""
@@ -264,8 +266,8 @@ def main():
     parser.add_argument('--dry-run', action='store_true', help='Process without sending')
     parser.add_argument('--batch-size', type=int, default=100, help='Batch size (default: 100)')
     parser.add_argument('--site', default='datadoghq.com',
-                       choices=['datadoghq.com', 'datadoghq.eu', 'us3.datadoghq.com', 'us5.datadoghq.com'],
-                       help='Datadog site (default: datadoghq.com)')
+                        choices=['datadoghq.com', 'datadoghq.eu', 'us3.datadoghq.com', 'us5.datadoghq.com'],
+                        help='Datadog site (default: datadoghq.com)')
     
     args = parser.parse_args()
     

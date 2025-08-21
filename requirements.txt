@@ -2,3 +2,10 @@ datadog_api_client==2.40.0
 matplotlib==3.10.3
 pandas==2.3.1
 Requests==2.32.4
+
+# Development dependencies
+flake8==7.1.1
+black==24.10.0
+isort==5.13.2
+pytest==8.3.3
+pytest-cov==6.0.0
