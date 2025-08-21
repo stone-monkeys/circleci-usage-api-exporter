@@ -1,0 +1,29 @@
+# This config file outlines the pipeline that will run when a PR has been opened.
+
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/python:3.13.1
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            make install
+      - run:
+          name: Check code formatting
+          command: |
+            make format
+      - run:
+          name: Linting
+          command: |
+            make lint
+
+
+workflows:
+  lint-and-test:
+    jobs:
+      - lint
