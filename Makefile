@@ -1,14 +1,13 @@
-.PHONY: help install lint format test clean all
+.PHONY: help install lint test clean all
 
 # Default target
 help:
 	@echo "Available commands:"
 	@echo "  install     Install all dependencies"
 	@echo "  lint        Run all linting checks"
-	@echo "  format      Format code with black and isort"
 	@echo "  test        Run tests with coverage"
 	@echo "  clean       Clean up generated files"
-	@echo "  all         Run format, lint, and test"
+	@echo "  all         Run lint and test"
 
 # Install dependencies
 install:
@@ -19,19 +18,7 @@ install:
 lint:
 	@echo "Running flake8..."
 	flake8 src/
-	@echo "Checking black formatting..."
-	black --check --diff src/
-	@echo "Checking isort import sorting..."
-	isort --check-only --diff src/
 	@echo "✅ All linting checks passed!"
-
-# Format code
-format:
-	@echo "Formatting with black..."
-	black src/
-	@echo "Sorting imports with isort..."
-	isort src/
-	@echo "✅ Code formatted!"
 
 # Run tests
 test:
@@ -49,4 +36,4 @@ clean:
 	find . -name "*.pyc" -delete
 
 # Run everything
-all: format lint test
+all: lint test

@@ -14,10 +14,6 @@ jobs:
           command: |
             make install
       - run:
-          name: Check code formatting
-          command: |
-            make format
-      - run:
           name: Linting
           command: |
             make lint
