@@ -1,5 +1,4 @@
 # Import modules
-import os
 import glob
 
 # List all CSV files in the 'reports' directory
