@@ -3,7 +3,7 @@
 version: 2.1
 
 jobs:
-  lint:
+  lint-and-test:
     docker:
       - image: cimg/python:3.13.5
     resource_class: small
@@ -17,9 +17,12 @@ jobs:
           name: Linting
           command: |
             make lint
-
+      - run:
+          name: Testing
+          command: |
+            make test
 
 workflows:
-  lint-and-test:
+  testing:
     jobs:
-      - lint
+      - lint-and-test
