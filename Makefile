@@ -23,8 +23,8 @@ lint:
 # Run tests
 test:
 	@echo "Running tests with pytest..."
-	pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=html
-	@echo "✅ Tests completed! Coverage report available in htmlcov/"
+	python -m pytest tests/ -v
+	@echo "✅ Tests completed!"
 
 # Clean up generated files
 clean:
