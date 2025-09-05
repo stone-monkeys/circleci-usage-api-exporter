@@ -3,23 +3,96 @@ version: 2.1
 parameters:
   org_id:
     type: string
-    default: ${CIRCLE_ORGANIZATION_ID}
+    default: $CIRCLE_ORGANIZATION_ID
+  cost_per_credit:
+    type: string
+    default: "0.0006"
+  job_name:
+    type: string
+    default: "unit_tests"
 
-jobs:
-  generate-usage-report:
+executors:
+  python-small:
     docker:
       - image: cimg/python:3.13.1
     resource_class: small
+  python-large:
+    docker:
+      - image: cimg/python:3.13.1
+    resource_class: large
+
+commands:
+  install-requirements:
+    description: "Install Python dependencies from requirements.txt with caching"
     steps:
-      - checkout
+      - restore_cache:
+          keys:
+            - pip-deps-v1-{{ checksum "requirements.txt" }}
+            - pip-deps-v1-
       - run:
           name: Install dependencies
           command: |
-            pip3 install requests pandas matplotlib
+            pip install --user -r requirements.txt
+      - save_cache:
+          key: pip-deps-v1-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.local/lib/python3.13/site-packages
+  
+  install-all-deps:
+    description: "Install all dependencies (requirements + analysis) with caching"
+    steps:
+      - restore_cache:
+          keys:
+            - system-deps-v1-{{ checksum "requirements.txt" }}-jupyter
+            - system-deps-v1-
+      - run:
+          name: Install Python dependencies
+          command: |
+            pip3 install -r requirements.txt
+      - run:
+          name: Install Jupyter
+          command: |
+            pip3 install jupyter nbconvert
+      - save_cache:
+          key: system-deps-v1-{{ checksum "requirements.txt" }}-jupyter
+          paths:
+            - /usr/local/lib/python3.13/dist-packages
+  
+  verify-merged-data:
+    description: "Verify merged data file exists"
+    steps:
+      - run:
+          name: Verify merged data file exists
+          command: |
+            ls -la /tmp/merged.csv
+            echo "Using merged file directly from workspace at /tmp/merged.csv"
+  
+  run-analysis:
+    description: "Run analysis script with parameters"
+    parameters:
+      analysis_type:
+        type: string
+    steps:
+      - run:
+          name: Execute << parameters.analysis_type >> analysis
+          command: |
+            cd src
+            if [ "<< pipeline.parameters.job_name >>" != "" ]; then
+              python run_analysis.py --type << parameters.analysis_type >> --job << pipeline.parameters.job_name >> --credit-cost << pipeline.parameters.cost_per_credit >>
+            else
+              python run_analysis.py --type << parameters.analysis_type >> --credit-cost << pipeline.parameters.cost_per_credit >>
+            fi
+
+jobs:
+  generate-usage-report:
+    executor: python-small
+    steps:
+      - checkout
+      - install-requirements
       - run:
           environment:
-            START_DATE: "2025-03-01"
-            END_DATE: "2025-04-01"
+            START_DATE: "2025-07-01"
+            END_DATE: "2025-08-01"
             ORG_ID: << pipeline.parameters.org_id >>
           name: Get Usage Report
           command: |
@@ -39,22 +112,40 @@ jobs:
             - merged.csv
       - store_artifacts:
           path: /tmp/reports
+  
   send-metrics-to-datadog:
-    docker:
-      - image: cimg/python:3.13.1
-    resource_class: small
+    executor: python-small
     steps:
       - checkout
       - attach_workspace:
           at: /tmp
-      - run:
-          name: Install dependencies
-          command: |
-            pip3 install datadog-api-client
+      - install-requirements
       - run:
           name: Send metrics to Datadog
-          command: |
-            python ./src/send_to_datadog.py /tmp/merged.csv
+          command: python ./src/send_to_datadog.py /tmp/merged.csv
+
+  generate-resource-class-analysis:
+    executor: python-large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - install-all-deps
+      - verify-merged-data
+      - run-analysis:
+          analysis_type: "resource"
+      - persist_to_workspace:
+          root: /tmp
+          paths: reports
+
+  gather-artifacts:
+    executor: python-small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - store_artifacts:
+          path: /tmp/reports
 
 workflows:
   use-usage-api:
@@ -62,8 +153,9 @@ workflows:
       - generate-usage-report:
           context:
             - my-context
-      - send-metrics-to-datadog:
+      - generate-resource-class-analysis:
           requires:
             - generate-usage-report
-          context:
-            - my-context
+      - gather-artifacts:
+          requires:
+            - generate-resource-class-analysis
