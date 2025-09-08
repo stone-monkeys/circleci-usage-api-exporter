@@ -12,7 +12,6 @@ Usage:
 """
 
 import argparse
-import analysis
 import os
 import sys
 import subprocess
@@ -153,7 +152,7 @@ def run_existing_notebook_with_params(analysis_type, project_name=None, individu
         print(f"Set environment variables: {env_vars}")
         return notebook_file
     else:
-        print(f"Simplified notebook not found, creating minimal notebook")
+        print("Simplified notebook not found, creating minimal notebook")
         return create_minimal_notebook(analysis_type, project_name, individual_job_name, credit_cost)
 
 
@@ -162,7 +161,6 @@ def create_minimal_notebook(analysis_type, project_name=None, individual_job_nam
     Create a minimal notebook that uses the common analysis library.
     This replaces the need for complex parameter injection.
     """
-    analysis_config = ANALYSIS_TYPES[analysis_type]
     
     # Create notebook content based on analysis type
     if analysis_type == 'job':
@@ -859,7 +857,7 @@ def run_notebook_conversion(notebook_path, output_dir, analysis_type):
     
     try:
         # Run from current directory (src/) where the analysis.py is located
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        subprocess.run(cmd, capture_output=True, text=True, check=True)
         print(f"✅ {analysis_config['title']} generated successfully!")
         print(f"📄 HTML report saved to: {output_file}")
         return output_file
@@ -874,7 +872,7 @@ def main():
     """Main execution function."""
     parser = argparse.ArgumentParser(description='Run CircleCI Usage Analysis')
     parser.add_argument('--type', choices=['job', 'project', 'compute-credits', 'resource'], required=True,
-                      help='Type of analysis to run')
+                        help='Type of analysis to run')
     parser.add_argument('--project', help='Project name to analyze (auto-detected if not provided)')
     parser.add_argument('--job', default='deploy', help='Individual job name to analyze (for job analysis)')
     parser.add_argument('--credit-cost', type=float, default=0.0006, help='Cost per credit in dollars')

@@ -17,12 +17,14 @@ warnings.filterwarnings('ignore')
 
 # === CONFIGURATION ===
 
+
 def setup_pandas_display():
     """Configure pandas display options for better notebook output."""
     pd.set_option("display.max_colwidth", None)
     pd.set_option("display.max_columns", None)
     pd.set_option("display.colheader_justify", "left")
     pd.set_option('display.precision', 2)
+
 
 def setup_matplotlib():
     """Configure matplotlib for notebook environments."""
@@ -32,7 +34,7 @@ def setup_matplotlib():
         ipython = get_ipython()
         if ipython is not None:
             ipython.run_line_magic('matplotlib', 'inline')
-    except:
+    except Exception:
         # Fallback for non-notebook environments
         import matplotlib
         matplotlib.use('Agg')
@@ -45,6 +47,7 @@ def setup_matplotlib():
     plt.rcParams['savefig.dpi'] = 100
     plt.rcParams['savefig.bbox'] = 'tight'
     plt.rcParams['savefig.format'] = 'png'
+
 
 def _display_plot():
     """Helper function to properly display plots in notebooks and HTML output."""
@@ -68,6 +71,7 @@ def _display_plot():
         # Fallback to regular show
         plt.show()
 
+
 def setup_jupyter_css():
     """Apply custom CSS styling for tables."""
     return HTML("""
@@ -87,6 +91,7 @@ def setup_jupyter_css():
 
 # === DATA LOADING AND PREPROCESSING ===
 
+
 def load_circleci_data(filepath, project_name=None, credit_cost=0.0006):
     """
     Load and preprocess CircleCI usage data from CSV file.
@@ -102,7 +107,6 @@ def load_circleci_data(filepath, project_name=None, credit_cost=0.0006):
     print(f"Loading CircleCI data from: {filepath}")
     
     # Load CSV data
-    dtypes = {"JOB_RUN_SECONDS": int, "PIPELINE_NUM": int}
     na_values = ["\\N"]
     df = pd.read_csv(filepath, escapechar="\\", na_values=na_values)
     
@@ -134,6 +138,7 @@ def load_circleci_data(filepath, project_name=None, credit_cost=0.0006):
     
     return df, project_dfs
 
+
 def add_computed_fields(df, credit_cost):
     """Add computed fields to the dataframe."""
     # Cost calculation
@@ -151,6 +156,7 @@ def add_computed_fields(df, credit_cost):
     
     return df
 
+
 def _create_job_url(row):
     """Create CircleCI job URL from row data."""
     try:
@@ -163,6 +169,7 @@ def _create_job_url(row):
         )
     except (ValueError, TypeError):
         return "N/A"
+
 
 def remove_unnecessary_columns(df):
     """Remove columns that aren't needed for analysis."""
@@ -179,6 +186,7 @@ def remove_unnecessary_columns(df):
     if existing_cols_to_remove:
         df = df.drop(columns=existing_cols_to_remove)
     return df
+
 
 def create_project_datasets(df, project_name):
     """Create project-specific filtered datasets."""
@@ -207,6 +215,7 @@ def create_project_datasets(df, project_name):
         'ps_pr_failed_jobs': ps_pr_failed_jobs,
     }
 
+
 def summarize_dataset(dataframe, name="Dataset"):
     """Generate a summary string for a dataset."""
     if dataframe.empty:
@@ -234,11 +243,13 @@ def summarize_dataset(dataframe, name="Dataset"):
 
 # === HELPER FUNCTIONS FOR DISPLAY ===
 
+
 def code(val: str):
     """Format a value as code."""
     if pd.isna(val):
         return "<code>N/A</code>"
     return f"<code>{val}</code>"
+
 
 def duration(delta):
     """Format a timedelta as HH:MM:SS."""
@@ -254,11 +265,13 @@ def duration(delta):
     except (ValueError, AttributeError):
         return f"<code>Error: {delta}</code>"
 
+
 def dollar_amount(val):
     """Format a value as currency."""
     if pd.isna(val):
         return "$0.00"
     return f"${val:.2f}"
+
 
 def pp(df, title=""):
     """Pretty-print a dataframe with custom formatting."""
@@ -288,12 +301,14 @@ def pp(df, title=""):
 
 # === ANALYSIS FUNCTIONS ===
 
+
 def percentile(n):
     """Create a percentile function for pandas aggregations."""
     def percentile_(x):
         return x.quantile(n)
     percentile_.__name__ = f'percentile_{n*100:02.0f}'
     return percentile_
+
 
 def group_by_job_name(base_df, status=""):
     """Create aggregated statistics grouped by job name."""
@@ -310,6 +325,7 @@ def group_by_job_name(base_df, status=""):
         AVG_COST=("COST", "mean") if "COST" in base_df.columns else pd.NA,
         TOTAL_COST=("COST", "sum") if "COST" in base_df.columns else pd.NA,
     ).reset_index()
+
 
 def analyse_jobs(df, title_prefix="Job", min_jobs=100):
     """Analyze job performance with various metrics."""
@@ -340,6 +356,7 @@ def analyse_jobs(df, title_prefix="Job", min_jobs=100):
 
 # === VISUALIZATION FUNCTIONS ===
 
+
 def use_durations_on_y_axis():
     """Format y-axis to show durations in HH:MM:SS format."""
     ax = plt.gca()
@@ -352,6 +369,7 @@ def use_durations_on_y_axis():
     
     from matplotlib.ticker import FuncFormatter
     ax.yaxis.set_major_formatter(FuncFormatter(format_duration_axis))
+
 
 def plot_cost_distribution(costs, title="Cost Distribution", max_xvalue=None, bins=50):
     """Plot cost distribution with descriptive statistics."""
@@ -385,6 +403,7 @@ def plot_cost_distribution(costs, title="Cost Distribution", max_xvalue=None, bi
     print(f"Median: ${costs.median():.2f}")
     print(f"95th percentile: ${costs.quantile(0.95):.2f}")
     print(f"Max: ${costs.max():.2f}")
+
 
 def analyse_durations(durations, title="Duration Analysis", max_xvalue=None, bins=50):
     """Analyze and plot duration distribution."""
@@ -428,6 +447,7 @@ def analyse_durations(durations, title="Duration Analysis", max_xvalue=None, bin
     print(f"Max:\t\t{format_seconds(duration_seconds.max())}")
 
 # === RESOURCE UTILIZATION ANALYSIS ===
+
 
 def analyze_resource_utilization(df, cpu_threshold=40, ram_threshold=40, min_jobs=5):
     """
@@ -550,6 +570,7 @@ def analyze_resource_utilization(df, cpu_threshold=40, ram_threshold=40, min_job
         'raw_resource_data': resource_df
     }
 
+
 def analyze_executor_resource_combinations(df):
     """
     Analyze all available executor and resource class combinations in the data.
@@ -605,6 +626,7 @@ def analyze_executor_resource_combinations(df):
     combo_stats = combo_stats.sort_values(sort_column, ascending=False)
     
     return combo_stats
+
 
 def plot_resource_utilization_scatter(df, title="Resource Utilization by Job", color_by='EXECUTOR_RESOURCE_CLEAN'):
     """Create a scatter plot of CPU vs RAM utilization."""
@@ -664,6 +686,7 @@ def plot_resource_utilization_scatter(df, title="Resource Utilization by Job", c
     
     _display_plot()
 
+
 def plot_resource_utilization_distribution(utilization_data, resource_type="CPU", bins=30, executor_data=None):
     """Plot distribution of resource utilization with optional executor breakdown."""
     plt.figure(figsize=(14, 6))
@@ -671,7 +694,6 @@ def plot_resource_utilization_distribution(utilization_data, resource_type="CPU"
     if executor_data is not None and 'EXECUTOR' in executor_data.columns:
         # Create stacked histogram by executor type
         executors = executor_data['EXECUTOR'].unique()
-        colors = plt.cm.Set2(range(len(executors)))
         
         executor_data_list = []
         labels = []
@@ -684,17 +706,17 @@ def plot_resource_utilization_distribution(utilization_data, resource_type="CPU"
                 labels.append(f'{executor.title()} ({len(executor_utilization)} jobs)')
         
         if executor_data_list:
-            plt.hist(executor_data_list, bins=bins, alpha=0.7, label=labels, 
-                    edgecolor='black', linewidth=0.5, stacked=False)
+            plt.hist(executor_data_list, bins=bins, alpha=0.7, label=labels,
+                     edgecolor='black', linewidth=0.5, stacked=False)
             plt.legend()
         else:
             # Fallback to simple histogram
-            plt.hist(utilization_data.dropna(), bins=bins, alpha=0.7, 
-                    edgecolor='black', color='lightblue')
+            plt.hist(utilization_data.dropna(), bins=bins, alpha=0.7,
+                     edgecolor='black', color='lightblue')
     else:
         # Simple histogram without executor breakdown
-        plt.hist(utilization_data.dropna(), bins=bins, alpha=0.7, 
-                edgecolor='black', color='lightblue')
+        plt.hist(utilization_data.dropna(), bins=bins, alpha=0.7,
+                 edgecolor='black', color='lightblue')
     
     plt.title(f'{resource_type} Utilization Distribution')
     plt.xlabel(f'{resource_type} Utilization (%)')
@@ -723,7 +745,7 @@ def plot_resource_utilization_distribution(utilization_data, resource_type="CPU"
     print(f"Jobs below 40%: {(utilization_data < 40).sum():,} ({(utilization_data < 40).mean()*100:.1f}%)")
     
     if executor_data is not None and 'EXECUTOR' in executor_data.columns:
-        print(f"\nBreakdown by executor:")
+        print("\nBreakdown by executor:")
         for executor in executor_data['EXECUTOR'].unique():
             executor_mask = executor_data['EXECUTOR'] == executor
             executor_utilization = utilization_data[executor_mask]
@@ -731,6 +753,7 @@ def plot_resource_utilization_distribution(utilization_data, resource_type="CPU"
                 below_40_pct = (executor_utilization < 40).mean() * 100
                 print(f"  {executor.title()}: {executor_utilization.mean():.1f}% avg, "
                       f"{len(executor_utilization)} jobs, {below_40_pct:.1f}% below 40%")
+
 
 def plot_cost_by_executor_resource(df, title="Cost Distribution by Executor + Resource Class"):
     """Create a cost distribution plot broken down by executor and resource class."""
@@ -778,6 +801,7 @@ def plot_cost_by_executor_resource(df, title="Cost Distribution by Executor + Re
     cost_summary = cost_summary.sort_values('Total Cost', ascending=False)
     print(cost_summary)
 
+
 def plot_utilization_vs_cost_scatter(df, title="Resource Utilization vs Cost"):
     """Create scatter plots showing the relationship between utilization and cost."""
     if df.empty or 'EXECUTOR_RESOURCE_CLEAN' not in df.columns:
@@ -792,10 +816,10 @@ def plot_utilization_vs_cost_scatter(df, title="Resource Utilization vs Cost"):
     
     for i, category in enumerate(categories):
         category_data = df[df['EXECUTOR_RESOURCE_CLEAN'] == category]
-        ax1.scatter(category_data['MEDIAN_CPU_UTILIZATION_PCT_mean'], 
-                   category_data['COST_sum'],
-                   label=category, alpha=0.7, s=60, color=colors[i],
-                   edgecolors='black', linewidth=0.5)
+        ax1.scatter(category_data['MEDIAN_CPU_UTILIZATION_PCT_mean'],
+                    category_data['COST_sum'],
+                    label=category, alpha=0.7, s=60, color=colors[i],
+                    edgecolors='black', linewidth=0.5)
     
     ax1.set_xlabel('Average CPU Utilization (%)')
     ax1.set_ylabel('Total Cost ($)')
@@ -806,10 +830,10 @@ def plot_utilization_vs_cost_scatter(df, title="Resource Utilization vs Cost"):
     # RAM utilization vs cost
     for i, category in enumerate(categories):
         category_data = df[df['EXECUTOR_RESOURCE_CLEAN'] == category]
-        ax2.scatter(category_data['MEDIAN_RAM_UTILIZATION_PCT_mean'], 
-                   category_data['COST_sum'],
-                   label=category, alpha=0.7, s=60, color=colors[i],
-                   edgecolors='black', linewidth=0.5)
+        ax2.scatter(category_data['MEDIAN_RAM_UTILIZATION_PCT_mean'],
+                    category_data['COST_sum'],
+                    label=category, alpha=0.7, s=60, color=colors[i],
+                    edgecolors='black', linewidth=0.5)
     
     ax2.set_xlabel('Average RAM Utilization (%)')
     ax2.set_ylabel('Total Cost ($)')
@@ -826,6 +850,7 @@ def plot_utilization_vs_cost_scatter(df, title="Resource Utilization vs Cost"):
     print("- Points in the upper-left quadrant are expensive but underutilized")
     print("- Points in the lower-right quadrant are well-utilized and cost-effective")
     print("- Look for outliers that might need resource class adjustments")
+
 
 def plot_executor_comparison_chart(executor_stats, title="Executor Performance Comparison"):
     """Create a comprehensive comparison chart of executor types."""
@@ -849,8 +874,8 @@ def plot_executor_comparison_chart(executor_stats, title="Executor Performance C
     
     # Add value labels on bars
     for bar, value in zip(bars1, executor_stats['MEDIAN_CPU_UTILIZATION_PCT_mean']):
-        ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, 
-                f'{value:.1f}%', ha='center', va='bottom')
+        ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                 f'{value:.1f}%', ha='center', va='bottom')
     
     # RAM Utilization comparison
     bars2 = ax2.bar(executors, executor_stats['MEDIAN_RAM_UTILIZATION_PCT_mean'], 
@@ -863,8 +888,8 @@ def plot_executor_comparison_chart(executor_stats, title="Executor Performance C
     
     # Add value labels on bars
     for bar, value in zip(bars2, executor_stats['MEDIAN_RAM_UTILIZATION_PCT_mean']):
-        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, 
-                f'{value:.1f}%', ha='center', va='bottom')
+        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                 f'{value:.1f}%', ha='center', va='bottom')
     
     # Total Cost comparison
     bars3 = ax3.bar(executors, executor_stats['COST_sum'], 
@@ -875,8 +900,8 @@ def plot_executor_comparison_chart(executor_stats, title="Executor Performance C
     
     # Add value labels on bars
     for bar, value in zip(bars3, executor_stats['COST_sum']):
-        ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + value*0.01, 
-                f'${value:.0f}', ha='center', va='bottom')
+        ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + value*0.01,
+                 f'${value:.0f}', ha='center', va='bottom')
     
     # Average Cost per Job comparison
     bars4 = ax4.bar(executors, executor_stats['COST_mean'], 
@@ -887,8 +912,8 @@ def plot_executor_comparison_chart(executor_stats, title="Executor Performance C
     
     # Add value labels on bars
     for bar, value in zip(bars4, executor_stats['COST_mean']):
-        ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + value*0.01, 
-                f'${value:.2f}', ha='center', va='bottom')
+        ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + value*0.01,
+                 f'${value:.2f}', ha='center', va='bottom')
     
     _display_plot()
     
@@ -899,6 +924,7 @@ def plot_executor_comparison_chart(executor_stats, title="Executor Performance C
               f"{row['MEDIAN_RAM_UTILIZATION_PCT_mean']:.1f}% RAM, "
               f"${row['COST_mean']:.2f} avg cost/job, "
               f"{row['UNIQUE_JOBS']} unique jobs")
+
 
 def plot_resource_class_heatmap(df, title="Resource Class Utilization Heatmap"):
     """Create a heatmap showing utilization patterns by executor and resource class."""
@@ -927,13 +953,13 @@ def plot_resource_class_heatmap(df, title="Resource Class Utilization Heatmap"):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
         
         # CPU utilization heatmap
-        sns.heatmap(cpu_pivot, annot=True, fmt='.1f', cmap='RdYlGn', 
-                   cbar_kws={'label': 'CPU Utilization (%)'}, ax=ax1)
+        sns.heatmap(cpu_pivot, annot=True, fmt='.1f', cmap='RdYlGn',
+                    cbar_kws={'label': 'CPU Utilization (%)'}, ax=ax1)
         ax1.set_title('CPU Utilization by Executor and Resource Class')
         
         # RAM utilization heatmap
-        sns.heatmap(ram_pivot, annot=True, fmt='.1f', cmap='RdYlGn', 
-                   cbar_kws={'label': 'RAM Utilization (%)'}, ax=ax2)
+        sns.heatmap(ram_pivot, annot=True, fmt='.1f', cmap='RdYlGn',
+                    cbar_kws={'label': 'RAM Utilization (%)'}, ax=ax2)
         ax2.set_title('RAM Utilization by Executor and Resource Class')
         
         _display_plot()
@@ -952,16 +978,16 @@ def plot_resource_class_heatmap(df, title="Resource Class Utilization Heatmap"):
         
         # Create bubble chart
         for i, row in grouped.iterrows():
-            ax.scatter(row['MEDIAN_CPU_UTILIZATION_PCT_mean'], 
-                      row['MEDIAN_RAM_UTILIZATION_PCT_mean'],
-                      s=200, alpha=0.7,
-                      label=f"{row['EXECUTOR']} {row['RESOURCE_CLASS']}")
+            ax.scatter(row['MEDIAN_CPU_UTILIZATION_PCT_mean'],
+                       row['MEDIAN_RAM_UTILIZATION_PCT_mean'],
+                       s=200, alpha=0.7,
+                       label=f"{row['EXECUTOR']} {row['RESOURCE_CLASS']}")
             
             # Add labels
-            ax.annotate(f"{row['EXECUTOR']}\n{row['RESOURCE_CLASS']}", 
-                       (row['MEDIAN_CPU_UTILIZATION_PCT_mean'], 
-                        row['MEDIAN_RAM_UTILIZATION_PCT_mean']),
-                       xytext=(5, 5), textcoords='offset points', fontsize=8)
+            ax.annotate(f"{row['EXECUTOR']}\n{row['RESOURCE_CLASS']}",
+                        (row['MEDIAN_CPU_UTILIZATION_PCT_mean'],
+                         row['MEDIAN_RAM_UTILIZATION_PCT_mean']),
+                        xytext=(5, 5), textcoords='offset points', fontsize=8)
         
         ax.set_xlabel('Average CPU Utilization (%)')
         ax.set_ylabel('Average RAM Utilization (%)')
@@ -971,6 +997,7 @@ def plot_resource_class_heatmap(df, title="Resource Class Utilization Heatmap"):
         ax.axhline(y=40, color='red', linestyle='--', alpha=0.7)
         
         _display_plot()
+
 
 def suggest_resource_optimizations(underutilized_df, cost_savings_threshold=10):
     """
@@ -1008,10 +1035,11 @@ def suggest_resource_optimizations(underutilized_df, cost_savings_threshold=10):
         print(f"   Resource Class: {resource_class}")
         print(f"   CPU Utilization: {cpu_util:.1f}% | RAM Utilization: {ram_util:.1f}%")
         print(f"   Total Cost: ${total_cost:.2f} | Avg Duration: {avg_duration:.1f} minutes")
-        print(f"   💡 Consider downgrading to a smaller resource class")
+        print("   💡 Consider downgrading to a smaller resource class")
         print()
 
 # === JOB DURATION ANALYSIS ===
+
 
 def analyze_jobs_by_duration(df, min_jobs=5, top_n=10):
     """
@@ -1084,6 +1112,7 @@ def analyze_jobs_by_duration(df, min_jobs=5, top_n=10):
     return top_duration_jobs
 
 # === INITIALIZATION FUNCTION ===
+
 
 def initialize_notebook(setup_display=True, setup_plots=True, setup_styles=True):
     """Initialize notebook environment with common settings."""
