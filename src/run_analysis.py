@@ -201,13 +201,27 @@ def create_minimal_notebook(analysis_type, project_name=None, individual_job_nam
     return temp_notebook.name
 
 
-def create_base_setup_cells():
+def create_base_setup_cells(org_name=None, report_name="Usage", project_name=None):
     """Create common setup cells used by all analysis types."""
+    # Build the title with organization and project information
+    title = f"# CircleCI {report_name} Analysis"
+    
+    # Add organization and project info as a subheader
+    subtitle_parts = []
+    if org_name:
+        subtitle_parts.append(f"## Organization: {org_name}")
+    if project_name:
+        subtitle_parts.append(f"## Project: {project_name}")
+    
+    if subtitle_parts:
+        subtitle = f"\n{chr(10).join(subtitle_parts)}"
+        title += subtitle
+    
     return [
         {
             "cell_type": "markdown",
             "metadata": {},
-            "source": ["# CircleCI Usage Analysis\n", "Generated analysis report using the unified analysis framework."]
+            "source": [title + "\n\nGenerated analysis report using the unified analysis framework."]
         },
         {
             "cell_type": "code",
@@ -231,7 +245,9 @@ def create_base_setup_cells():
 
 def create_job_analysis_cells(project_name, individual_job_name, credit_cost):
     """Create cells for job analysis notebook."""
-    cells = create_base_setup_cells()
+    import os
+    org_name = os.getenv("CIRCLE_PROJECT_USERNAME", "unknown-org")
+    cells = create_base_setup_cells(org_name=org_name, report_name="Job", project_name=project_name)
     
     cells.extend([
         {
@@ -342,7 +358,9 @@ def create_job_analysis_cells(project_name, individual_job_name, credit_cost):
 
 def create_project_analysis_cells(project_name, credit_cost):
     """Create cells for project analysis notebook."""
-    cells = create_base_setup_cells()
+    import os
+    org_name = os.getenv("CIRCLE_PROJECT_USERNAME", "unknown-org")
+    cells = create_base_setup_cells(org_name=org_name, report_name="Project", project_name=project_name)
     
     cells.extend([
         {
@@ -425,7 +443,9 @@ def create_project_analysis_cells(project_name, credit_cost):
 
 def create_compute_credits_cells(credit_cost):
     """Create cells for compute credits analysis."""
-    cells = create_base_setup_cells()
+    import os
+    org_name = os.getenv("CIRCLE_PROJECT_USERNAME", "unknown-org")
+    cells = create_base_setup_cells(org_name=org_name, report_name="Compute Credits", project_name=None)
     
     cells.extend([
         {
@@ -500,7 +520,9 @@ def create_compute_credits_cells(credit_cost):
 
 def create_resource_analysis_cells(project_name, credit_cost):
     """Create cells for comprehensive resource utilization analysis notebook."""
-    cells = create_base_setup_cells()
+    import os
+    org_name = os.getenv("CIRCLE_PROJECT_USERNAME", "unknown-org")
+    cells = create_base_setup_cells(org_name=org_name, report_name="Resource Class", project_name=project_name)
     
     cells.extend([
         {
