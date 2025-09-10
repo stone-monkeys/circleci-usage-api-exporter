@@ -3,10 +3,8 @@
 ###
 
 # Import modules
-import os
-import glob
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # Find the merged files
 merged_file_path = '/tmp/reports/merged.csv'

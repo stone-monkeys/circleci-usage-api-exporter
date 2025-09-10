@@ -1,10 +1,11 @@
 # Import modules
-import os
-import requests
-import json
-import time
 import gzip
+import json
+import os
 import sys
+import time
+
+import requests
 
 # Build data to send with requests
 ORG_ID = os.getenv('ORG_ID')
@@ -24,7 +25,7 @@ response = requests.post(
     headers={"Circle-Token": CIRCLECI_TOKEN, "Content-Type": "application/json"},
     data=json.dumps(post_data)
 )
-#print out the API response for the usage report request
+# Print out the API response for the usage report request
 print("Response Content:", response.json())  # This will parse the JSON response
 
 # Once requested, the report can take some time to process, so a retry is built-in
@@ -33,7 +34,7 @@ if response.status_code == 201:
     data = response.json()
     USAGE_REPORT_ID = data.get("usage_export_job_id")
     print(f"Report ID is {USAGE_REPORT_ID}")
-    
+  
     # Check if the report is ready for downloading as it can take a while to process
     for i in range(5):
         print("Checking if report can be downloaded")
@@ -50,13 +51,11 @@ if response.status_code == 201:
             download_urls = report.get("download_urls", [])
 
             if not os.path.exists("reports"):
-                os.makedirs("/tmp/reports")
-            
+                os.makedirs("/tmp/reports")          
             for idx, url in enumerate(download_urls):
                 r = requests.get(url)
                 with open(f"/tmp/usage_report_{idx}.csv.gz", "wb") as f:
-                    f.write(r.content)
-                
+                    f.write(r.content)             
                 with gzip.open(f"/tmp/usage_report_{idx}.csv.gz", "rb") as f_in:
                     with open(f"/tmp/reports/usage_report_{idx}.csv", "wb") as f_out:
                         f_out.write(f_in.read())
@@ -64,12 +63,10 @@ if response.status_code == 201:
                 print(f"File {idx} downloaded and extracted")
 
             print("All files downloaded and extracted to the /reports directory")
-            break
-        
+            break      
         elif report_status == "processing":
             print("Report still processing. Retrying in 1 minute...")
-            time.sleep(60)  # Wait for 60 seconds before retrying
-        
+            time.sleep(60)  # Wait for 60 seconds before retrying       
         else:
             print(f"Report status: {report_status}. Error occurred.")
             break
