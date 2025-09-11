@@ -4,11 +4,12 @@ Lightweight script to process a CSV file and send metrics to DoiT DataHub API.
 Usage: python send_to_doit.py <path_to_csv> [--api-key <key>] [--batch-size <size>]
 """
 
-import os, csv, argparse, time, math
+import os
+import csv
+import argparse
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 import requests
-import json
 
 
 class DoiTDataHubIngest:
@@ -44,10 +45,18 @@ class DoiTDataHubIngest:
                         continue
                     
                     # UUID and string fields - keep as strings
-                    if (key in ['ORGANIZATION_ID', 'PROJECT_ID', 'PIPELINE_ID', 'WORKFLOW_ID', 'JOB_ID', 'PIPELINE_TRIGGER_USER_ID'] or
-                        key in ['ORGANIZATION_NAME', 'PROJECT_NAME', 'VCS_NAME', 'VCS_URL', 'VCS_BRANCH', 
-                              'PIPELINE_TRIGGER_SOURCE', 'WORKFLOW_NAME', 'JOB_NAME', 'JOB_BUILD_STATUS',
-                              'RESOURCE_CLASS', 'OPERATING_SYSTEM', 'EXECUTOR']):
+                    if (
+                        key in [
+                            'ORGANIZATION_ID', 'PROJECT_ID', 'PIPELINE_ID', 'WORKFLOW_ID', 
+                            'JOB_ID', 'PIPELINE_TRIGGER_USER_ID'
+                        ]
+                        or key in [
+                            'ORGANIZATION_NAME', 'PROJECT_NAME', 'VCS_NAME', 'VCS_URL',
+                            'VCS_BRANCH', 'PIPELINE_TRIGGER_SOURCE', 'WORKFLOW_NAME',
+                            'JOB_NAME', 'JOB_BUILD_STATUS', 'RESOURCE_CLASS',
+                            'OPERATING_SYSTEM', 'EXECUTOR'
+                        ]
+                    ):
                         cleaned_row[key] = value
                     
                     # Integer fields
@@ -362,4 +371,4 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main()) 
+    exit(main())
